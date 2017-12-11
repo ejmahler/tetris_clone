@@ -1,0 +1,7 @@
+[package]
+name = "tetris_clone"
+version = "0.1.0"
+authors = ["emahler <join.together@gmail.com>"]
+
+[dependencies]
+piston_window = "*"
