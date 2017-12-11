@@ -10,8 +10,8 @@ mod core;
 mod tetris;
 
 fn main() {
-    let window = WindowSettings::new("Dark Tetris", [640, 480]).exit_on_esc(true).build().unwrap();
-    let mut app = tetris::TetrisApp::new(window);
+    let mut window = WindowSettings::new("Dark Tetris", [640, 480]).exit_on_esc(true).build().unwrap();
+    let mut app = tetris::TetrisApp::new(&mut window);
 
     core::exec(&mut app);
 }

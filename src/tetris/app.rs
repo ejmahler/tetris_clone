@@ -7,15 +7,15 @@ use ::core::App;
 
 use super::tetris_input::TetrisInput;
 
-pub struct TetrisApp {
-    window: PistonWindow,
+pub struct TetrisApp<'app> {
+    window: &'app mut PistonWindow,
     input: TetrisInput,
     red: f32,
     green: f32,
 }
 
-impl TetrisApp {
-    pub fn new(window: PistonWindow) -> Self {
+impl<'app> TetrisApp<'app> {
+    pub fn new(window: &'app mut PistonWindow) -> Self {
         Self {
             window,
             input: TetrisInput::new(),
@@ -24,7 +24,7 @@ impl TetrisApp {
         }
     }
 }
-impl App for TetrisApp {
+impl<'app> App for TetrisApp<'app> {
     fn create_event_settings(&self) -> EventSettings {
         let mut settings = EventSettings::new();
         settings.max_fps = 30;
