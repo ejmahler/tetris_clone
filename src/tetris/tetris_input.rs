@@ -1,21 +1,21 @@
 
-mod button;
+use ::core::BinaryAxis;
 use piston_window::{Input, Button, Key};
 
 pub struct TetrisInput {
-    pub arrow_left: button::BinaryAxis,
-    pub arrow_right: button::BinaryAxis,
-    pub arrow_up: button::BinaryAxis,
-    pub arrow_down: button::BinaryAxis,
+    pub arrow_left: BinaryAxis,
+    pub arrow_right: BinaryAxis,
+    pub arrow_up: BinaryAxis,
+    pub arrow_down: BinaryAxis,
 }
 
 impl TetrisInput {
     pub fn new() -> Self {
         Self {
-            arrow_left: button::BinaryAxis::new(),
-            arrow_right: button::BinaryAxis::new(),
-            arrow_up: button::BinaryAxis::new(),
-            arrow_down: button::BinaryAxis::new(),
+            arrow_left: BinaryAxis::new(),
+            arrow_right: BinaryAxis::new(),
+            arrow_up: BinaryAxis::new(),
+            arrow_down: BinaryAxis::new(),
         }
     }
 

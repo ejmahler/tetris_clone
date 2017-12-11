@@ -5,14 +5,12 @@ extern crate num_traits;
 use piston::event_loop::Events;
 use piston_window::{WindowSettings, Loop, Event};
 
-mod app;
-mod game_input;
-
-use app::TetrisApp;
+mod core;
+mod tetris;
 
 fn main() {
     let window = WindowSettings::new("Hello Piston!", [640, 480]).exit_on_esc(true).build().unwrap();
-    let mut app = TetrisApp::new(window);
+    let mut app = tetris::TetrisApp::new(window);
 
     let mut events = Events::new(app.create_event_settings());
 

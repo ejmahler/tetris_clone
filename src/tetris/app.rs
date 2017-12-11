@@ -3,7 +3,7 @@ use piston::event_loop::EventSettings;
 use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input, Event, Loop, rectangle, clear};
 use num_traits;
 
-use game_input::TetrisInput;
+use super::tetris_input::TetrisInput;
 
 pub struct TetrisApp {
     window: PistonWindow,
