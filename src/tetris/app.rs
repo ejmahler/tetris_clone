@@ -37,8 +37,8 @@ impl TetrisApp {
 
 
 
-    pub fn render(&mut self, event: RenderArgs) {
-        let placation_event = Event::from(Loop::from(event));
+    pub fn render(&mut self, event: &RenderArgs) {
+        let placation_event = Event::from(Loop::from(*event));
         let red = self.red;
         let green = self.green;
 
@@ -50,15 +50,15 @@ impl TetrisApp {
                         graphics);
         });
     }
-    pub fn after_render(&mut self, _: AfterRenderArgs) {
+    pub fn after_render(&mut self, _: &AfterRenderArgs) {
 
     }
 
-    pub fn update(&mut self, args: UpdateArgs) {
+    pub fn update(&mut self, args: &UpdateArgs, input_events: &[Input]) {
         let dt = args.dt as f32;
 
         // update our input axes
-        self.input.update(dt);
+        self.input.update(dt, input_events);
         
         // if the player pressed the left arrow this frame only, set red to 1
         if self.input.arrow_left.pressed_this_frame() {
@@ -74,10 +74,7 @@ impl TetrisApp {
             self.green = num_traits::clamp(self.green - dt, 0.0, 1.0);
         }
     }
-    pub fn idle(&mut self, _: IdleArgs) {
+    pub fn idle(&mut self, _: &IdleArgs) {
 
-    }
-    pub fn handle_input(&mut self, args: Input) {
-        self.input.handle_input(&args);
     }
 }
