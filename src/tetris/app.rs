@@ -3,6 +3,8 @@ use piston::event_loop::EventSettings;
 use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input, Event, Loop, rectangle, clear};
 use num_traits;
 
+use ::core::App;
+
 use super::tetris_input::TetrisInput;
 
 pub struct TetrisApp {
@@ -21,8 +23,9 @@ impl TetrisApp {
             green: 0.0,
         }
     }
-
-    pub fn create_event_settings(&self) -> EventSettings {
+}
+impl App for TetrisApp {
+    fn create_event_settings(&self) -> EventSettings {
         let mut settings = EventSettings::new();
         settings.max_fps = 30;
         settings.ups = 30;
@@ -30,14 +33,14 @@ impl TetrisApp {
         settings
     }
 
-    pub fn get_window<'a>(&'a mut self) -> &'a mut PistonWindow {
+    fn get_window<'a>(&'a mut self) -> &'a mut PistonWindow {
         &mut self.window
     }
 
 
 
 
-    pub fn render(&mut self, event: &RenderArgs) {
+    fn render(&mut self, event: &RenderArgs) {
         let placation_event = Event::from(Loop::from(*event));
         let red = self.red;
         let green = self.green;
@@ -50,11 +53,11 @@ impl TetrisApp {
                         graphics);
         });
     }
-    pub fn after_render(&mut self, _: &AfterRenderArgs) {
+    fn after_render(&mut self, _: &AfterRenderArgs) {
 
     }
 
-    pub fn update(&mut self, args: &UpdateArgs, input_events: &[Input]) {
+    fn update(&mut self, args: &UpdateArgs, input_events: &[Input]) {
         let dt = args.dt as f32;
 
         // update our input axes
@@ -74,7 +77,7 @@ impl TetrisApp {
             self.green = num_traits::clamp(self.green - dt, 0.0, 1.0);
         }
     }
-    pub fn idle(&mut self, _: &IdleArgs) {
+    fn idle(&mut self, _: &IdleArgs) {
 
     }
 }
