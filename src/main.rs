@@ -1,10 +1,13 @@
 extern crate piston_window;
+use piston_window::{WindowSettings, RenderArgs, Key, Loop, Button, UpdateArgs, Event, IdleArgs, AfterRenderArgs, PistonWindow, Input, rectangle, clear};
 
-use piston_window::{WindowSettings, RenderArgs, ButtonState, Key, Loop, Button, UpdateArgs, AdvancedWindow, Event, IdleArgs, ButtonEvent, AfterRenderArgs, PistonWindow, Input, rectangle, clear};
+mod button;
+use button::BinaryAxis;
 
 struct TetrisApp {
     window: PistonWindow,
-    holding_space: bool,
+    arrow_left: BinaryAxis,
+    arrow_right: BinaryAxis,
     red: f32,
     green: f32,
 }
@@ -12,7 +15,8 @@ struct TetrisApp {
 fn main() {
     let mut app = TetrisApp {
         window: WindowSettings::new("Hello Piston!", [640, 480]).exit_on_esc(true).build().unwrap(),
-        holding_space: false,
+        arrow_left: BinaryAxis::new(),
+        arrow_right: BinaryAxis::new(),
         red: 1.0,
         green: 0.0,
     };
@@ -58,13 +62,23 @@ fn clamp<T: PartialOrd + Copy>(value: T, min: T, max: T) -> T {
 }
 
 fn event_update(args: UpdateArgs, app: &mut TetrisApp) {
-
     let dt = args.dt as f32;
-    if app.holding_space {
+
+    // update our input axes
+    app.arrow_left.update(dt);
+    app.arrow_right.update(dt);
+    
+    // if the player pressed the left arrow this frame only, set red to 1
+    if app.arrow_left.pressed_this_frame() {
+        app.red = 1.0;
+    } else {
         app.red = clamp(app.red - dt, 0.0, 1.0);
+    }
+
+    // if the player is holding the right arrow, fade to green
+    if app.arrow_right.pressed() {
         app.green = clamp(app.green + dt, 0.0, 1.0);
     } else {
-        app.red = clamp(app.red + dt, 0.0, 1.0);
         app.green = clamp(app.green - dt, 0.0, 1.0);
     }
 }
@@ -73,8 +87,10 @@ fn event_idle(_: IdleArgs, _: &mut TetrisApp) {
 }
 fn event_input(args: Input, app: &mut TetrisApp) {
     if let Input::Button(args) = args {
-        if args.button == Button::Keyboard(Key::Space) {
-            app.holding_space = args.state == ButtonState::Press;
+        match args.button {
+            Button::Keyboard(Key::Left) => app.arrow_left.state_change(&args.state),
+            Button::Keyboard(Key::Right) => app.arrow_right.state_change(&args.state),
+            _ => {}
         }
     }
 }
