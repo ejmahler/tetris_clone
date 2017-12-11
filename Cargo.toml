@@ -5,3 +5,5 @@ authors = ["emahler <join.together@gmail.com>"]
 
 [dependencies]
 piston_window = "*"
+piston = "*"
+num-traits = "*"
