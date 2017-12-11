@@ -1,13 +1,11 @@
 extern crate piston_window;
-use piston_window::{WindowSettings, RenderArgs, Key, Loop, Button, UpdateArgs, Event, IdleArgs, AfterRenderArgs, PistonWindow, Input, rectangle, clear};
+use piston_window::{WindowSettings, RenderArgs, Loop, UpdateArgs, Event, IdleArgs, AfterRenderArgs, PistonWindow, Input, rectangle, clear};
 
-mod button;
-use button::BinaryAxis;
+mod game_input;
 
 struct TetrisApp {
     window: PistonWindow,
-    arrow_left: BinaryAxis,
-    arrow_right: BinaryAxis,
+    input: game_input::TetrisInput,
     red: f32,
     green: f32,
 }
@@ -15,8 +13,7 @@ struct TetrisApp {
 fn main() {
     let mut app = TetrisApp {
         window: WindowSettings::new("Hello Piston!", [640, 480]).exit_on_esc(true).build().unwrap(),
-        arrow_left: BinaryAxis::new(),
-        arrow_right: BinaryAxis::new(),
+        input: game_input::TetrisInput::new(),
         red: 1.0,
         green: 0.0,
     };
@@ -65,18 +62,17 @@ fn event_update(args: UpdateArgs, app: &mut TetrisApp) {
     let dt = args.dt as f32;
 
     // update our input axes
-    app.arrow_left.update(dt);
-    app.arrow_right.update(dt);
+    app.input.update(dt);
     
     // if the player pressed the left arrow this frame only, set red to 1
-    if app.arrow_left.pressed_this_frame() {
+    if app.input.arrow_left.pressed_this_frame() {
         app.red = 1.0;
     } else {
         app.red = clamp(app.red - dt, 0.0, 1.0);
     }
 
     // if the player is holding the right arrow, fade to green
-    if app.arrow_right.pressed() {
+    if app.input.arrow_right.pressed() {
         app.green = clamp(app.green + dt, 0.0, 1.0);
     } else {
         app.green = clamp(app.green - dt, 0.0, 1.0);
@@ -86,11 +82,5 @@ fn event_idle(_: IdleArgs, _: &mut TetrisApp) {
 
 }
 fn event_input(args: Input, app: &mut TetrisApp) {
-    if let Input::Button(args) = args {
-        match args.button {
-            Button::Keyboard(Key::Left) => app.arrow_left.state_change(&args.state),
-            Button::Keyboard(Key::Right) => app.arrow_right.state_change(&args.state),
-            _ => {}
-        }
-    }
+    app.input.handle_input(&args);
 }
