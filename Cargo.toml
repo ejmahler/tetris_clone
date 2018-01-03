@@ -7,3 +7,6 @@ authors = ["emahler <join.together@gmail.com>"]
 piston_window = "*"
 piston = "*"
 num-traits = "*"
+gfx = "*"
+gfx_device_gl = "*"
+cgmath = "*"
