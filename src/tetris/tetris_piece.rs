@@ -4,7 +4,7 @@ use rand::Rng;
 
 use num_traits::Zero;
 
-use ::core::intvector::{IntVector2, CardinalRotation};
+use ::engine::intvector::{IntVector2, CardinalRotation};
 
 #[derive(Clone, Copy)]
 pub enum PieceType {

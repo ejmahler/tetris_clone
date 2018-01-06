@@ -1,5 +1,5 @@
 
-use ::core::BinaryAxis;
+use ::engine::BinaryAxis;
 use piston_window::{Input, Button, Key};
 
 pub struct TetrisInput {

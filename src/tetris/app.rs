@@ -7,8 +7,8 @@ use num_traits::{Zero, One};
 use cgmath::{Decomposed, Vector3, Matrix4, Quaternion, ortho};
 use rand::thread_rng;
 
-use ::core::App;
-use ::core::intvector::IntVector2;
+use ::engine::App;
+use ::engine::intvector::IntVector2;
 
 use super::tetris_input::TetrisInput;
 use super::render::RenderState;
