@@ -8,6 +8,7 @@ lto = true
 
 [dependencies]
 piston_window = "*"
+image = "*"
 piston = "*"
 num-traits = "*"
 gfx = "0.16.*"

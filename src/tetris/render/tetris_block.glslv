@@ -5,7 +5,7 @@ in vec2 in_uv0;
 out vec2 v_TexCoord;
 
 layout (std140)
-uniform Globals {
+uniform Transients {
 	mat4 u_transform;
     vec4 u_tintColor;
 };

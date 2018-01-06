@@ -4,7 +4,7 @@ use piston_window::{Window, PistonWindow, RenderArgs, AfterRenderArgs, UpdateArg
 
 use num_traits::{Zero, One, clamp};
 
-use cgmath::{Transform, Decomposed, Point3, Vector3, Vector4, Matrix4, Quaternion, ortho};
+use cgmath::{Decomposed, Vector3, Vector4, Matrix4, Quaternion, ortho};
 
 use ::core::App;
 
@@ -14,6 +14,8 @@ use super::render::RenderState;
 pub struct TetrisApp<'app> {
     window: &'app mut PistonWindow,
     render_state: RenderState,
+
+
     input: TetrisInput,
 
     projection_matrix: Matrix4<f32>,
@@ -68,17 +70,15 @@ impl<'app> App for TetrisApp<'app> {
 
     fn render(&mut self, _: &RenderArgs) {
         let model_view: Decomposed<Vector3<f32>, Quaternion<f32>> = Decomposed {
-            scale: 100.0,
+            scale: 1.0,
             rot: Quaternion::one(),
             disp: Vector3::zero(),
         };
         let model_view_matrix: Matrix4<f32> = model_view.into();
 
-        let transform = self.projection_matrix * model_view_matrix;
-
         let color = Vector4::new(self.red, self.green, 1.0, 1.0);
 
-        self.render_state.render_tetris_block(&mut self.window, &self.projection_matrix, &color);
+        self.render_state.render_tetris_block(&mut self.window, &(self.projection_matrix * model_view_matrix), &color);
     }
     fn after_render(&mut self, _: &AfterRenderArgs) {
 

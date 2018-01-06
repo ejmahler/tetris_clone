@@ -1,4 +1,5 @@
 #![feature(universal_impl_trait)]
+#![feature(nll)]
 
 #[macro_use]
 extern crate gfx;
@@ -6,6 +7,7 @@ extern crate gfx_device_gl;
 
 extern crate piston_window;
 extern crate piston;
+extern crate image;
 extern crate cgmath;
 extern crate num_traits;
 

@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 
 use gfx;
 use gfx::format::Srgba8;
@@ -6,6 +7,7 @@ use gfx::Slice;
 use gfx::traits::FactoryExt;
 use gfx::handle::RenderTargetView;
 use cgmath::{Vector4, Matrix4};
+use piston_window::{Texture, TextureSettings, Flip, Filter};
 
 gfx_defines!{
     vertex Vertex {
@@ -13,14 +15,19 @@ gfx_defines!{
         uv0: [f32; 2] = "in_uv0",
     }
 
-    constant Globals {
+    constant Transients {
         transform: [[f32; 4];4] = "u_transform",
         tint_color: [f32; 4] = "u_tintColor",
     }
 
+    /*constant Constants {
+        albedoMap: ,
+    }*/
+
     pipeline pipe {
         vbuf: gfx::VertexBuffer<Vertex> = (),
-        globals: gfx::ConstantBuffer<Globals> = "Globals",
+        transients: gfx::ConstantBuffer<Transients> = "Transients",
+        texture_albedo: gfx::TextureSampler<[f32; 4]> = "t_albedoMap",
         out: gfx::RenderTarget<Srgba8> = "Target0",
     }
 }
@@ -41,13 +48,26 @@ pub struct TetrisBlock<R: gfx::Resources> {
     vbuf_slice: Slice<R>,
     pso: PipelineState<R, pipe::Meta>,
     pso_data: pipe::Data<R>,
+
+    #[allow(unused)]
+    albedo_data: Texture<R>,
 }
 
 impl<R: gfx::Resources> TetrisBlock<R> {
     pub fn new(factory: &mut impl FactoryExt<R>, target: &RenderTargetView<R, Srgba8>) -> Self {
+
+        //set up the VBO
         let index_slice: &[u16] = &QUAD_INDICES;
         let (vertex_buffer, slice) = factory.create_vertex_buffer_with_slice(&QUAD_VERTS, index_slice);
 
+        //set up the textures
+        let texture_path: PathBuf = ["resources","textures","tetris_square_albedo.png"].iter().collect();
+        println!("{:?}", texture_path);
+        let texture_settings = TextureSettings::new().mag(Filter::Nearest);
+
+        let albedo_tex = Texture::from_path(factory, texture_path, Flip::None, &texture_settings).unwrap();
+
+        // combine everything
         Self {
             vbuf_slice: slice,
             pso: factory.create_pipeline_simple(
@@ -57,19 +77,21 @@ impl<R: gfx::Resources> TetrisBlock<R> {
             ).unwrap(),
             pso_data: pipe::Data {
                 vbuf: vertex_buffer,
-                globals: factory.create_constant_buffer(1),
+                transients: factory.create_constant_buffer(1),
+                texture_albedo: (albedo_tex.view.clone(), albedo_tex.sampler.clone()),
                 out: target.clone(),
             },
+            albedo_data: albedo_tex
         }
     }
 
     pub fn render(&self, encoder: &mut gfx::Encoder<R, impl gfx::CommandBuffer<R>>, transform: &Matrix4<f32>, tint_color: &Vector4<f32>) {
-        let globals = Globals {
+        let transient_data = Transients {
             transform: (*transform).into(), 
             tint_color: (*tint_color).into(),
         };
 
-        encoder.update_constant_buffer(&self.pso_data.globals, &globals);
+        encoder.update_constant_buffer(&self.pso_data.transients, &transient_data);
         encoder.draw(&self.vbuf_slice, &self.pso, &self.pso_data);
     }
 }
