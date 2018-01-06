@@ -12,13 +12,13 @@ use ::engine::intvector::IntVector2;
 
 use super::tetris_input::TetrisInput;
 use super::render::RenderState;
-use super::tetris_piece::TetrisPiece;
+use super::tetromino::Tetromino;
 
 pub struct TetrisApp<'app> {
     window: &'app mut PistonWindow,
     render_state: RenderState,
 
-    active_piece: TetrisPiece,
+    active_tetromino: Tetromino,
     input: TetrisInput,
 
     projection_matrix: Matrix4<f32>,
@@ -33,7 +33,7 @@ impl<'app> TetrisApp<'app> {
             window,
             render_state: render_state,
 
-            active_piece: TetrisPiece::new_random(IntVector2::new(0,0), &mut thread_rng()),
+            active_tetromino: Tetromino::new_random(IntVector2::new(0,0), &mut thread_rng()),
             input: TetrisInput::new(),
 
             projection_matrix: Self::compute_projection(window_size.width as f32, window_size.height as f32),
@@ -77,9 +77,9 @@ impl<'app> App for TetrisApp<'app> {
         }.into();
         let view_projection_matrix = self.projection_matrix * view_matrix;
 
-        let piece_color = self.active_piece.get_color();
+        let piece_color = self.active_tetromino.get_color();
 
-        for cell in &self.active_piece.get_occupied_cells() {
+        for cell in &self.active_tetromino.get_occupied_cells() {
             let model_matrix: Matrix4<f32> = Decomposed::<Vector3<f32>, Quaternion<f32>> {
                 scale: 1.0,
                 rot: Quaternion::one(),
@@ -105,13 +105,13 @@ impl<'app> App for TetrisApp<'app> {
         
         // if the player pressed the left arrow this frame only, set red to 1
         if self.input.arrow_left.pressed_this_frame() {
-            self.active_piece = self.active_piece.rotated_left();
+            self.active_tetromino = self.active_tetromino.rotated_left();
         }
         if self.input.arrow_right.pressed_this_frame() {
-            self.active_piece = self.active_piece.rotated_right();
+            self.active_tetromino = self.active_tetromino.rotated_right();
         }
         if self.input.arrow_up.pressed_this_frame() {
-            self.active_piece = TetrisPiece::new_random(IntVector2::new(0,0), &mut thread_rng());
+            self.active_tetromino = Tetromino::new_random(IntVector2::new(0,0), &mut thread_rng());
         }
     }
     fn idle(&mut self, _: &IdleArgs) {
