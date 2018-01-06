@@ -9,7 +9,10 @@ extern crate piston_window;
 extern crate piston;
 extern crate image;
 extern crate cgmath;
+
 extern crate num_traits;
+
+extern crate rand;
 
 use piston_window::WindowSettings;
 

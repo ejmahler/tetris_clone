@@ -6,8 +6,9 @@ use gfx::pso::PipelineState;
 use gfx::Slice;
 use gfx::traits::FactoryExt;
 use gfx::handle::RenderTargetView;
-use cgmath::{Vector4, Matrix4};
+use cgmath::Matrix4;
 use piston_window::{Texture, TextureSettings, Flip, Filter};
+use image::Rgb;
 
 gfx_defines!{
     vertex Vertex {
@@ -85,10 +86,12 @@ impl<R: gfx::Resources> TetrisBlock<R> {
         }
     }
 
-    pub fn render(&self, encoder: &mut gfx::Encoder<R, impl gfx::CommandBuffer<R>>, transform: &Matrix4<f32>, tint_color: &Vector4<f32>) {
+    pub fn render(&self, encoder: &mut gfx::Encoder<R, impl gfx::CommandBuffer<R>>, transform: &Matrix4<f32>, tint_color: &Rgb<u8>) {
+
+        let tint_color_vec = [tint_color[0] as f32 / 255.0, tint_color[1] as f32 / 255.0, tint_color[2] as f32 / 255.0, 1.0];
         let transient_data = Transients {
             transform: (*transform).into(), 
-            tint_color: (*tint_color).into(),
+            tint_color: tint_color_vec,
         };
 
         encoder.update_constant_buffer(&self.pso_data.transients, &transient_data);

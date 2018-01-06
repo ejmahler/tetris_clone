@@ -2,6 +2,8 @@
 mod binary_axis;
 pub use self::binary_axis::BinaryAxis;
 
+pub mod intvector;
+
 use piston::event_loop::EventSettings;
 use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input, Event, Loop, EventLoop};
 
