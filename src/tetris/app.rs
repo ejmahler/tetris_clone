@@ -1,9 +1,10 @@
 
 use piston::event_loop::EventSettings;
-use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input};
-use num_traits;
+use piston_window::{Window, PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input};
 
-use cgmath::{Transform, Vector3, Vector4, Quaternion, Decomposed};
+use num_traits::{Zero, One, clamp};
+
+use cgmath::{Transform, Decomposed, Point3, Vector3, Vector4, Matrix4, Quaternion, ortho};
 
 use ::core::App;
 
@@ -14,19 +15,38 @@ pub struct TetrisApp<'app> {
     window: &'app mut PistonWindow,
     render_state: RenderState,
     input: TetrisInput,
+
+    projection_matrix: Matrix4<f32>,
+
     red: f32,
     green: f32,
 }
 
 impl<'app> TetrisApp<'app> {
     pub fn new(window: &'app mut PistonWindow) -> Self {
+        let window_size = window.window.size();
+
         let render_state = RenderState::new(window);
         Self {
             window,
             render_state: render_state,
             input: TetrisInput::new(),
+
+            projection_matrix: Self::compute_projection(window_size.width as f32, window_size.height as f32),
+
             red: 0.0,
             green: 0.0,
+        }
+    }
+
+    fn compute_projection(width: f32, height: f32) -> Matrix4<f32> {
+        if width > height {
+            let ratio = width / height;
+            ortho(-ratio, ratio, -1.0, 1.0, -1.0, 1.0)
+        }
+        else {
+            let ratio = height / width;
+            ortho(-1.0, 1.0, -ratio, ratio, -1.0, 1.0)
         }
     }
 }
@@ -47,10 +67,18 @@ impl<'app> App for TetrisApp<'app> {
 
 
     fn render(&mut self, _: &RenderArgs) {
-        let transform: Decomposed<Vector3<f32>, Quaternion<f32>> = Decomposed::one();
-        let color = Vector4::new(self.red, self.green, 0.0, 1.0);
+        let model_view: Decomposed<Vector3<f32>, Quaternion<f32>> = Decomposed {
+            scale: 100.0,
+            rot: Quaternion::one(),
+            disp: Vector3::zero(),
+        };
+        let model_view_matrix: Matrix4<f32> = model_view.into();
 
-        self.render_state.render_tetris_block(&mut self.window, &transform, &color);
+        let transform = self.projection_matrix * model_view_matrix;
+
+        let color = Vector4::new(self.red, self.green, 1.0, 1.0);
+
+        self.render_state.render_tetris_block(&mut self.window, &self.projection_matrix, &color);
     }
     fn after_render(&mut self, _: &AfterRenderArgs) {
 
@@ -67,17 +95,23 @@ impl<'app> App for TetrisApp<'app> {
         if self.input.arrow_left.pressed_this_frame() {
             self.red = 1.0;
         } else {
-            self.red = num_traits::clamp(self.red - dt, 0.0, 1.0);
+            self.red = clamp(self.red - dt, 0.0, 1.0);
         }
 
         // if the player is holding the right arrow, fade to green
         if self.input.arrow_right.pressed() {
-            self.green = num_traits::clamp(self.green + dt, 0.0, 1.0);
+            self.green = clamp(self.green + dt, 0.0, 1.0);
         } else {
-            self.green = num_traits::clamp(self.green - dt, 0.0, 1.0);
+            self.green = clamp(self.green - dt, 0.0, 1.0);
         }
     }
     fn idle(&mut self, _: &IdleArgs) {
 
+    }
+    fn resize(&mut self, width: u32, height: u32) {
+        self.projection_matrix = Self::compute_projection(width as f32, height as f32);
+
+        //rebuild the entire render state. TODO find a way to update each thing's render target without doing this or making the render state mutable
+        self.render_state = RenderState::new(&mut self.window);
     }
 }

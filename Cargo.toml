@@ -3,10 +3,13 @@ name = "tetris_clone"
 version = "0.1.0"
 authors = ["emahler <join.together@gmail.com>"]
 
+[profile.release]
+lto = true
+
 [dependencies]
 piston_window = "*"
 piston = "*"
 num-traits = "*"
-gfx = "*"
-gfx_device_gl = "*"
+gfx = "0.16.*"
+gfx_device_gl = "0.14.*"
 cgmath = "*"

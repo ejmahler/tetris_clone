@@ -5,7 +5,7 @@ use gfx::pso::PipelineState;
 use gfx::Slice;
 use gfx::traits::FactoryExt;
 use gfx::handle::RenderTargetView;
-use cgmath::{Vector4, Transform3, Matrix4};
+use cgmath::{Vector4, Matrix4};
 
 gfx_defines!{
     vertex Vertex {
@@ -63,12 +63,10 @@ impl<R: gfx::Resources> TetrisBlock<R> {
         }
     }
 
-    pub fn render(&self, encoder: &mut gfx::Encoder<R, impl gfx::CommandBuffer<R>>, transform: &impl Transform3<f32> + Copy, tint_color: &Vector4<f32>) {
-        let matrix: Matrix4<f32> = (*transform).into();
-
+    pub fn render(&self, encoder: &mut gfx::Encoder<R, impl gfx::CommandBuffer<R>>, transform: &Matrix4<f32>, tint_color: &Vector4<f32>) {
         let globals = Globals {
-            transform: matrix.into(), 
-            tint_color: tint_color.clone().into(),
+            transform: (*transform).into(), 
+            tint_color: (*tint_color).into(),
         };
 
         encoder.update_constant_buffer(&self.pso_data.globals, &globals);

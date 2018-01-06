@@ -2,8 +2,8 @@
 mod binary_axis;
 pub use self::binary_axis::BinaryAxis;
 
-use piston::event_loop::{Events, EventSettings};
-use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input, Event, Loop};
+use piston::event_loop::EventSettings;
+use piston_window::{PistonWindow, RenderArgs, AfterRenderArgs, UpdateArgs, IdleArgs, Input, Event, Loop, EventLoop};
 
 pub trait App {
     // config/setup methods
@@ -15,15 +15,21 @@ pub trait App {
     fn after_render(&mut self, args: &AfterRenderArgs);
     fn update(&mut self, args: &UpdateArgs, input_events: &[Input]);
     fn idle(&mut self, args: &IdleArgs);
+    fn resize(&mut self, width: u32, height: u32);
 }
 
 pub fn exec(app: &mut impl App) {
-    let mut event_loop = Events::new(app.create_event_settings());
+    let event_settings = app.create_event_settings();
+    app.get_window().set_event_settings(event_settings);
+
     let mut input_events = Vec::with_capacity(50);
 
-    while let Some(event) = event_loop.next(app.get_window()) {
+    while let Some(event) = app.get_window().next() {
         match event {
-            // when we get input, hold on to it, and we'll let the app process it all at once on the next update frame
+            //when we get resize input, tell the app to resize
+            Event::Input(Input::Resize(width, height)) => app.resize(width, height),
+
+            // when we get any other input, hold on to it, and we'll let the app process it all at once on the next update frame
             Event::Input(input) => input_events.push(input),
 
             // most events are simple pass-throughs to the app
