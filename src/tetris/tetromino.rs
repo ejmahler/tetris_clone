@@ -31,6 +31,12 @@ impl PieceType {
     }
 }
 
+enum RotationType {
+    None,
+    AroundCorner,
+    AroundCell,
+}
+
 #[derive(Clone, Copy)]
 pub struct Tetromino {
     piece_type: PieceType,
@@ -48,26 +54,31 @@ impl Tetromino {
     }
 
     pub fn get_occupied_cells(&self) -> [IntVector2<i8>; 4] {
-        let (rotate_around_corner, mut cells) = match self.piece_type {
-            PieceType::OBlock => return [IntVector2::new(0,0), IntVector2::new(0,1), IntVector2::new(1,0), IntVector2::new(1,1)],
+        let (rotation_type, mut cells) = match self.piece_type {
+            PieceType::OBlock => (RotationType::None, [IntVector2::new(0,0), IntVector2::new(0,1), IntVector2::new(1,0), IntVector2::new(1,1)]),
             
-            PieceType::IBlock => (true, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(2,0)]),
-            PieceType::LBlock => (false, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(1,1)]),
-            PieceType::JBlock => (false, [IntVector2::new(-1,1), IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0)]),
-            PieceType::SBlock => (false, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(0,1), IntVector2::new(1,1)]),
-            PieceType::ZBlock => (false, [IntVector2::new(-1,1), IntVector2::new(0,1), IntVector2::new(0,0), IntVector2::new(1,0)]),
-            PieceType::TBlock => (false, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(0,1)]),
+            PieceType::IBlock => (RotationType::AroundCorner, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(2,0)]),
+
+            PieceType::LBlock => (RotationType::AroundCell, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(1,1)]),
+            PieceType::JBlock => (RotationType::AroundCell, [IntVector2::new(-1,1), IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0)]),
+            PieceType::SBlock => (RotationType::AroundCell, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(0,1), IntVector2::new(1,1)]),
+            PieceType::ZBlock => (RotationType::AroundCell, [IntVector2::new(-1,1), IntVector2::new(0,1), IntVector2::new(0,0), IntVector2::new(1,0)]),
+            PieceType::TBlock => (RotationType::AroundCell, [IntVector2::new(-1,0), IntVector2::new(0,0), IntVector2::new(1,0), IntVector2::new(0,1)]),
         };
 
-        if rotate_around_corner {
-            for entry in &mut cells {
-                *entry = self.position + entry.rotate_around_corner(IntVector2::new(1,0), self.orientation);
-            }
-        }
-        else {
-            for entry in &mut cells {
-                *entry = self.position + entry.rotate_around_cell(IntVector2::zero(), self.orientation);
-            }
+        match rotation_type {
+            RotationType::None =>
+                for entry in &mut cells {
+                    *entry = self.position + *entry;
+                },
+            RotationType::AroundCorner =>
+                for entry in &mut cells {
+                    *entry = self.position + entry.rotate_around_corner(IntVector2::new(1,0), self.orientation);
+                },
+            RotationType::AroundCell =>
+                for entry in &mut cells {
+                    *entry = self.position + entry.rotate_around_cell(IntVector2::zero(), self.orientation);
+                },
         }
 
         cells
@@ -89,7 +100,19 @@ impl Tetromino {
         }
     }
 
+    pub fn moved(&self, offset: IntVector2<i8>) -> Self {
+        Self {
+            piece_type: self.piece_type,
+            orientation: self.orientation,
+            position: self.position + offset,
+        }
+    }
+
     pub fn get_color(&self) -> Rgb<u8> {
         self.piece_type.get_color()
     }
+}
+
+pub struct OrphanBlock {
+    pub color: Rgb<u8>,
 }

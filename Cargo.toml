@@ -11,7 +11,10 @@ piston_window = "*"
 image = "*"
 piston = "*"
 num-traits = "*"
-gfx = "0.16.*"
-gfx_device_gl = "0.14.*"
 cgmath = "*"
 rand = "*"
+ndarray = "*"
+
+# as of this writing, piston_window can't use the latest versions of these libraries
+gfx = "0.16.*"
+gfx_device_gl = "0.14.*"

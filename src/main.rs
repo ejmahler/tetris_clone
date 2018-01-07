@@ -1,4 +1,5 @@
 #![feature(universal_impl_trait)]
+#![feature(conservative_impl_trait)]
 #![feature(nll)]
 
 #[macro_use]
@@ -9,6 +10,7 @@ extern crate piston_window;
 extern crate piston;
 extern crate image;
 extern crate cgmath;
+extern crate ndarray;
 
 extern crate num_traits;
 

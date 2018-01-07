@@ -7,6 +7,10 @@ pub struct TetrisInput {
     pub arrow_right: BinaryAxis,
     pub arrow_up: BinaryAxis,
     pub arrow_down: BinaryAxis,
+
+    pub key_a: BinaryAxis,
+    pub key_s: BinaryAxis,
+    pub key_d: BinaryAxis,
 }
 
 impl TetrisInput {
@@ -16,6 +20,10 @@ impl TetrisInput {
             arrow_right: BinaryAxis::new(),
             arrow_up: BinaryAxis::new(),
             arrow_down: BinaryAxis::new(),
+
+            key_a: BinaryAxis::new(),
+            key_s: BinaryAxis::new(),
+            key_d: BinaryAxis::new(),
         }
     }
 
@@ -28,6 +36,10 @@ impl TetrisInput {
                     Button::Keyboard(Key::Right) => self.arrow_right.state_change(&button_input.state),
                     Button::Keyboard(Key::Up) => self.arrow_up.state_change(&button_input.state),
                     Button::Keyboard(Key::Down) => self.arrow_down.state_change(&button_input.state),
+
+                    Button::Keyboard(Key::A) => self.key_a.state_change(&button_input.state),
+                    Button::Keyboard(Key::S) => self.key_s.state_change(&button_input.state),
+                    Button::Keyboard(Key::D) => self.key_d.state_change(&button_input.state),
                     _ => {}
                 }
             }
@@ -38,5 +50,9 @@ impl TetrisInput {
         self.arrow_right.update(dt);
         self.arrow_up.update(dt);
         self.arrow_down.update(dt);
+
+        self.key_a.update(dt);
+        self.key_s.update(dt);
+        self.key_d.update(dt);
     }
 }
