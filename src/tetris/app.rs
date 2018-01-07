@@ -128,9 +128,9 @@ impl<'app> App for TetrisApp<'app> {
         self.input.update(dt, input_events);
 
         // If we're waiting to spawn a new tetromino, update the cooldown
-        if let TetrominoState::Spawning(mut cooldown) = self.state {
-            cooldown -= dt;
-            if cooldown < 0.0 {
+        if let TetrominoState::Spawning(ref mut spawn_cooldown) = self.state {
+            *spawn_cooldown -= dt;
+            if *spawn_cooldown < 0.0 {
                 let new_tetromino = Tetromino::new_random(self.playfield.spawn_location(), &mut thread_rng());
                 if !self.playfield.is_valid_placement(&new_tetromino) {
                     self.state = TetrominoState::GameOver;
@@ -139,28 +139,23 @@ impl<'app> App for TetrisApp<'app> {
                     self.state = TetrominoState::Active(new_tetromino, 0.0)
                 }
             }
-            else {
-                self.state = TetrominoState::Spawning(cooldown)
-            }
         }
 
         // If we have an active tetromino, update its position from gravity
-        if let TetrominoState::Active(active_tetromino, mut drop_cooldown) = self.state {
-            drop_cooldown -= dt;
+        if let TetrominoState::Active(ref mut active_tetromino, ref mut drop_cooldown) = self.state {
+            *drop_cooldown -= dt;
 
             // If we've hit the drop cooldown, move this piece down by 1 row. If we can't, lock it in place.
-            if drop_cooldown < 0.0 {
+            if *drop_cooldown < 0.0 {
                 let moved_tetromino = active_tetromino.moved(IntVector2::new(0, -1));
                 if self.playfield.is_valid_placement(&moved_tetromino) {
-                    self.state = TetrominoState::Active(moved_tetromino, 1.0)
+                    *active_tetromino = moved_tetromino;
+                    *drop_cooldown = 1.0;
                 }
                 else {
                     self.playfield.lock_tetromino(&active_tetromino);
                     self.state = TetrominoState::Spawning(1.0)
                 }
-            }
-            else {
-                self.state = TetrominoState::Active(active_tetromino, drop_cooldown)
             }
         }
 
