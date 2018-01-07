@@ -99,7 +99,7 @@ impl<'app> App for TetrisApp<'app> {
         }
 
         // render the active piece, if present
-        if let &TetrominoState::Active(ref active_tetromino, _) = &self.state {
+        if let TetrominoState::Active(ref active_tetromino, _) = self.state {
             let piece_color = active_tetromino.get_color();
 
             for cell in &active_tetromino.get_occupied_cells() {
@@ -165,7 +165,7 @@ impl<'app> App for TetrisApp<'app> {
         }
 
         // If we STILL have an active tetromino after dropping, handle player input
-        if let &mut TetrominoState::Active(ref mut active_tetromino, _) = &mut self.state {
+        if let TetrominoState::Active(ref mut active_tetromino, _) = self.state {
 
             // try to move the tetromino left
             if self.input.arrow_left.pressed_this_frame() {
